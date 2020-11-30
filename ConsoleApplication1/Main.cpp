@@ -39,10 +39,13 @@ int main()
 
 	Camera cam;
 
-	Hitable *list[2];
+	Hitable *list[5];
 	list[0] = new Sphere(Vector3(0, 0, -1), 0.5);
-	list[1] = new Sphere(Vector3(0, -100.5, -1), 100);
-	Hitable *world = new HitableList(list, 2);
+	list[1] = new Sphere(Vector3(0.5, 0.5, -1), 0.25);
+	list[2] = new Sphere(Vector3(-0.5, 0.5, -1), 0.25);
+	list[3] = new Sphere(Vector3(0, 0.15, -0.5), 0.1);
+	list[4] = new Sphere(Vector3(0, -100.5, -1), 100);
+	Hitable *world = new HitableList(list, 5);
 
 	auto start = std::chrono::high_resolution_clock::now();
 
