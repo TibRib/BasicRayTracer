@@ -17,7 +17,7 @@ Color ray_color(const Ray& r, Hitable *world, int depth) {
 		return Color(0, 0, 0);
 
 	if (world->hit(r, 0.001, FLT_MAX, rec)) {
-		Vector3 target = rec.p + rec.normal + random_in_unit_sphere();
+		Vector3 target = rec.p + rec.normal + random_unit_vector();
 		return 0.5 * ray_color(Ray(rec.p, target - rec.p), world, depth - 1);
 	}
 	Vector3 unit_direction = unit_vector(r.direction());

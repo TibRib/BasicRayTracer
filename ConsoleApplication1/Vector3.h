@@ -162,6 +162,9 @@ inline Vector3 random_in_unit_sphere() {
 	}
 }
 
+inline Vector3 random_unit_vector() {
+	return unit_vector(random_in_unit_sphere());
+}
 
 
 
