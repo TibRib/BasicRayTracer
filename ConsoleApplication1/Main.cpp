@@ -48,13 +48,10 @@ int main()
 	list[1] = new Sphere(Vector3(0, -100.5, -1), 100);
 	Hitable *world = new HitableList(list, 2);
 
-	Color *pixels = (Color*) malloc(sizeof(Color) * image_height * image_width);
-
 	auto start = std::chrono::high_resolution_clock::now();
 	int id = 0;
 	std::cout << "Rendu en cours..." << std::endl;
 	
-
 #pragma omp parallel for num_threads(CHUNKS) 
 	for (int y = 0 ; y < image_height; ++y) {
 		for (int x = 0; x < image_width; ++x) {
@@ -65,7 +62,6 @@ int main()
 				Ray r = cam.get_ray(u, v);
 				pixel_color += ray_color(r, world, max_depth);
 			}
-			pixels[(y*image_width)+x] = pixel_color;
 #pragma omp critical
 			write_color(x, y, &consoleDC, pixel_color, samples_per_pixel);
 		}
