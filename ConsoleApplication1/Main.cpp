@@ -11,6 +11,10 @@
 using namespace std;
 float sense = 0;
 
+#ifndef CHUNKS
+#define CHUNKS 8
+#endif
+
 Color ray_color(const Ray& r, Hitable *world, int depth) {
 	hit_record rec;
 	if (depth <= 0)
@@ -39,17 +43,20 @@ int main()
 
 	Camera cam;
 
-	Hitable *list[5];
+	Hitable *list[2];
 	list[0] = new Sphere(Vector3(0, 0, -1), 0.5);
-	list[1] = new Sphere(Vector3(0.5, 0.5, -1), 0.25);
-	list[2] = new Sphere(Vector3(-0.5, 0.5, -1), 0.25);
-	list[3] = new Sphere(Vector3(0, 0.15, -0.5), 0.1);
-	list[4] = new Sphere(Vector3(0, -100.5, -1), 100);
-	Hitable *world = new HitableList(list, 5);
+	list[1] = new Sphere(Vector3(0, -100.5, -1), 100);
+	Hitable *world = new HitableList(list, 2);
+
+	Color *pixels = (Color*) malloc(sizeof(Color) * image_height * image_width);
 
 	auto start = std::chrono::high_resolution_clock::now();
+	int id = 0;
+	std::cout << "Rendu en cours..." << std::endl;
+	
 
-	for (int y = image_height - 1; y >= 0; --y) {
+#pragma omp parallel for num_threads(CHUNKS) 
+	for (int y = 0 ; y < image_height; ++y) {
 		for (int x = 0; x < image_width; ++x) {
 			Color pixel_color(0, 0, 0);
 			for (int s = 0; s < samples_per_pixel; ++s) {
@@ -58,16 +65,18 @@ int main()
 				Ray r = cam.get_ray(u, v);
 				pixel_color += ray_color(r, world, max_depth);
 			}
+			pixels[(y*image_width)+x] = pixel_color;
+#pragma omp critical
 			write_color(x, y, &consoleDC, pixel_color, samples_per_pixel);
 		}
 	}
 
 	auto stop = std::chrono::high_resolution_clock::now();
-	auto duration = std::chrono::duration_cast<std::chrono::seconds>(stop - start);
-
+	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start)/1000.f;
 
 	std::cout << "Fin du rendu" << std::endl;
-	std::cout << "Temps de processing : " << duration.count() << "secondes" << std::endl;
+	std::cout << "Temps de rendu : " << duration.count() << " secondes" << std::endl;
+	
 	ReleaseDC(consoleWindow, consoleDC);
 	return 0;
 }
