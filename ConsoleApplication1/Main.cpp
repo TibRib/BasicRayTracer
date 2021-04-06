@@ -62,10 +62,10 @@ int highestPowerof2(int n)
 int main()
 {
 	const double aspect_ratio = 16.0 / 9.0;
-	const int image_width = 1440; //96
+	const int image_width = 340; //96
 	const int image_height = static_cast<int>(image_width / aspect_ratio);
 	const int max_depth = 50;
-	const int samples_per_pixel = 20;
+	const int samples_per_pixel = 5;
 
 	Camera cam(90.0, aspect_ratio);
 
@@ -95,16 +95,16 @@ int main()
 	Color** grid = new Color*[image_width*image_height];
 	double dist = 0;
 
-	bool animated = false;
+	bool animated = true;
 	bool processFrames = true;
 
-	int inc = min(64,highestPowerof2(image_width));
+	int inc = min(5,highestPowerof2(image_width));
 
 	while (processFrames) {
-
 		auto start = chrono::high_resolution_clock::now();
-
-		//#pragma omp parallel for num_threads(CHUNKS) 
+		cout << "Rendu " << inc << ":1" << endl;
+		
+	#pragma omp parallel for num_threads(CHUNKS) 
 		for (int y = 0; y < image_height; ++y) {
 			for (int x = 0; x < image_width; x+=inc) {
 				Color pixel_color(0, 0, 0);
@@ -117,7 +117,7 @@ int main()
 
 				int id = (image_height - 1 - y) * image_width + x;
 				grid[id] = computeColor(x, y, pixel_color, scale);
-				for (int j = 1; j <= inc; j++) {
+				for (int j = 1; j < inc; j++) {
 					grid[id + j] = new Color(grid[id]->r(), grid[id]->g(), grid[id]->b());
 				}
 			}
@@ -147,10 +147,14 @@ int main()
 		}
 
 		//cam.moveZ(0.015);
-		//dist += 0.03;
+		dist += 0.1;
+		auto s = (Sphere*)list[1];
+		s->center.e[1] = 0.5 + cos(dist)/2;
 		//cam.setCoords(Vector3(cos(dist*2.0),0.5 ,-1.0+sin(dist)));
 
 	}
+
+	cout << "Rendu fini" << endl;
 
 	if (animated == false) {
 		while (display->ProcessInput()) {
