@@ -44,10 +44,25 @@ Color ray_color(const Ray& r, Hitable *world, int depth) {
 	return (1.0 - t)* Color(1.0, 1.0, 1.0) + t * Color(0.5, 0.7, 1.0);
 }
 
+int highestPowerof2(int n)
+{
+	int res = 0;
+	for (int i = n; i >= 1; i--)
+	{
+		// If i is a power of 2
+		if ((i & (i - 1)) == 0)
+		{
+			res = i;
+			break;
+		}
+	}
+	return res;
+}
+
 int main()
 {
 	const double aspect_ratio = 16.0 / 9.0;
-	const int image_width = 500; //96
+	const int image_width = 1440; //96
 	const int image_height = static_cast<int>(image_width / aspect_ratio);
 	const int max_depth = 50;
 	const int samples_per_pixel = 20;
@@ -80,20 +95,18 @@ int main()
 	Color** grid = new Color*[image_width*image_height];
 	double dist = 0;
 
-	bool animated = true;
+	bool animated = false;
 	bool processFrames = true;
 
+	int inc = min(64,highestPowerof2(image_width));
+
 	while (processFrames) {
-		if (animated == false) {
-			processFrames = false;
-		}
-		
+
 		auto start = chrono::high_resolution_clock::now();
-		int inc = 1;
 
 		//#pragma omp parallel for num_threads(CHUNKS) 
 		for (int y = 0; y < image_height; ++y) {
-			for (int x = 0; x <= image_width; x+=inc) {
+			for (int x = 0; x < image_width; x+=inc) {
 				Color pixel_color(0, 0, 0);
 				for (int s = 0; s < samples_per_pixel; ++s) {
 					auto u = (x + random_double()) / (image_width - 1);
@@ -125,6 +138,12 @@ int main()
 				//Check for windows closing intention
 				break;
 			}
+		}
+		else {
+			if (inc == 1) {
+				processFrames = false;
+			}
+			inc = (inc > 1) ? inc / 2 : 1;
 		}
 
 		//cam.moveZ(0.015);
