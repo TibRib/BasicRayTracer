@@ -17,14 +17,24 @@
 using namespace std;
 double sense = 0;
 
-#define CHUNKS 8
+#define CHUNKS 4
+
+Vector3 random_in_hemisphere(const Vector3& normal) {
+	Vector3 in_unit_sphere = random_in_unit_sphere();
+	if (dot(in_unit_sphere, normal) > 0.0) // In the same hemisphere as the normal
+		return in_unit_sphere;
+	else
+		return -in_unit_sphere;
+}
+
 Color ray_color(const Ray& r, Hitable *world, int depth) {
 	hit_record rec;
 	if (depth <= 0)
 		return Color(0, 0, 0);
 
 	if (world->hit(r, 0.001, FLT_MAX, rec)) {
-		Vector3 target = rec.p + rec.normal + random_unit_vector();
+		//Vector3 target = rec.p + rec.normal + random_unit_vector(); //Lambertian rendering
+		Vector3 target = rec.p + random_in_hemisphere(rec.normal); //Diffuse rendering
 		return 0.5 * ray_color(Ray(rec.p, target - rec.p), world, depth - 1);
 	}
 	Vector3 unit_direction = unit_vector(r.direction());
@@ -35,10 +45,10 @@ Color ray_color(const Ray& r, Hitable *world, int depth) {
 int main()
 {
 	const double aspect_ratio = 16.0 / 9.0;
-	const int image_width = 640;
+	const int image_width = 500;
 	const int image_height = static_cast<int>(image_width / aspect_ratio);
 	const int max_depth = 50;
-	const int samples_per_pixel = 1;
+	const int samples_per_pixel = 8;
 
 	Camera cam;
 
@@ -60,7 +70,8 @@ int main()
 
 	while (true) {
 		auto start = chrono::high_resolution_clock::now();
-#pragma omp parallel for num_threads(CHUNKS) 
+		
+		#pragma omp parallel for num_threads(CHUNKS) 
 		for (int y = 0; y < image_height; ++y) {
 			for (int x = 0; x < image_width; ++x) {
 				Color pixel_color(0, 0, 0);
@@ -89,7 +100,7 @@ int main()
 		cam.moveY(0.01);
 
 		if (display->ProcessInput() == false) {
-			//Check for windows closing
+			//Check for windows closing intention
 			break;
 		}
 	}
