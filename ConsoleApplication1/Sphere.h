@@ -1,8 +1,5 @@
-#pragma once
-
-#ifndef SPHERE_H
-#define SPHERE_H
-
+#ifndef _SPHERE_H_
+#define _SPHERE_H_
 
 #include "hitable.h"
 #include <cmath>
@@ -10,14 +7,14 @@
 class Sphere : public Hitable {
 public:
 	Sphere(){}
-	Sphere(Vector3 cen, float r) : center(cen), radius(r) {
+	Sphere(Vector3 cen, double r) : center(cen), radius(r) {
 	};
-	virtual bool hit(const Ray&r, float t_min, float t_max, hit_record& rec) const;
+	virtual bool hit(const Ray&r, double t_min, double t_max, hit_record& rec) const;
 	Vector3 center;
-	float radius;
+	double radius;
 };
 
-bool Sphere::hit(const Ray&r, float t_min, float t_max, hit_record& rec) const {
+bool Sphere::hit(const Ray&r, double t_min, double t_max, hit_record& rec) const {
 	Vector3 oc = r.origin() - center;
 	auto a = r.direction().squared_length();
 	auto half_b = dot(oc, r.direction());
@@ -45,4 +42,4 @@ bool Sphere::hit(const Ray&r, float t_min, float t_max, hit_record& rec) const {
 }
 
 
-#endif // !SPHERE_H
+#endif

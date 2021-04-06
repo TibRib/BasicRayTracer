@@ -1,7 +1,5 @@
-#pragma once
-
-#ifndef CAMERA_H
-#define CAMERA_H
+#ifndef _CAMERA_H_
+#define _CAMERA_H_
 
 #include "utils.h"
 #include "Vector3.h"
@@ -16,8 +14,8 @@ private:
 	Vector3 vertical;
 
 public:
-	Camera(float aspect_ratio = 16.f / 9.f, float viewport_height = 2.f, float focal_length =1.0f, Vector3 origin_v=Vector3(0,0,0)) {
-		float viewport_width = aspect_ratio * viewport_height;
+	Camera(double aspect_ratio = 16.f / 9.f, double viewport_height = 2.f, double focal_length =1.0f, Vector3 origin_v=Vector3(0,0,0)) {
+		double viewport_width = aspect_ratio * viewport_height;
 
 		origin = origin_v;
 		horizontal = Vector3(viewport_width, 0.0, 0.0);

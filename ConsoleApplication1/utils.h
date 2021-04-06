@@ -1,4 +1,10 @@
-#pragma once
+#ifndef _UTILS_H_
+#define _UTILS_H_
+
+/* Utilitary functions (mostly mathematics)
+   Used thorougly the program.
+*/
+
 #include <cstdlib>
 #include <random>
 
@@ -18,3 +24,5 @@ inline double clamp(double x, double min, double max) {
     // Clamps a value between a minimum and maximum
     return (x < min) ? min : ((x > max) ? max : x);
 }
+
+#endif

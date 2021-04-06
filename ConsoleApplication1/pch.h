@@ -11,9 +11,6 @@
 
 // TODO: Ajoutez les en-têtes à précompiler ici
 #include <iostream>
-#include <cstdlib>
-#include <cfloat>
 #include <windows.h>
 
-
-#endif //PCH_H
+#endif PCH_H

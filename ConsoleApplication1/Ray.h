@@ -1,8 +1,8 @@
-#pragma once
+#ifndef _RAY_H_
+#define _RAY_H_
+
 #include "Vector3.h"
 
-#ifndef RAY_H
-#define RAY_H
 class Ray
 {
 public:
@@ -11,7 +11,7 @@ public:
 
 	Vector3 origin() const { return A; }
 	Vector3 direction() const { return B; }
-	Vector3 point_at_parameter(float t) const { return A + t*B; }
+	Vector3 point_at_parameter(double t) const { return A + t*B; }
 
 	Vector3 A;
 	Vector3 B;

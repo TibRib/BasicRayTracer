@@ -1,13 +1,11 @@
-#pragma once
-
-#ifndef HITABLE_H
-#define HITABLE_H
+#ifndef _HITABLE_H_
+#define _HITABLE_H_
 
 #include "Vector3.h"
 #include "Ray.h"
 
 struct hit_record {
-	float t;
+	double t;
 	Vector3 p;
 	Vector3 normal;
 	bool front_face;
@@ -20,7 +18,7 @@ struct hit_record {
 
 class Hitable {
 public:
-	virtual bool hit(const Ray& r, float t_min, float t_max, hit_record& rec) const = 0;
+	virtual bool hit(const Ray& r, double t_min, double t_max, hit_record& rec) const = 0;
 };
 
 #endif
