@@ -61,8 +61,8 @@ SoftwareRenderer::SoftwareRenderer(int width, int height) {
     _width = width;
     _height = height;
 
-    uint32_t wwidth = 1920;
-    uint32_t wheight = 1080;
+    uint32_t wwidth = 1280;
+    uint32_t wheight = 720;
 
     /*Startup*/
     SDL_SetMainReady();

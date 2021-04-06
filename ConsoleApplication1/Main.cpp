@@ -23,15 +23,7 @@
 using namespace std;
 double sense = 0;
 
-#define CHUNKS 4
-
-Vector3 random_in_hemisphere(const Vector3& normal) {
-	Vector3 in_unit_sphere = random_in_unit_sphere();
-	if (dot(in_unit_sphere, normal) > 0.0) // In the same hemisphere as the normal
-		return in_unit_sphere;
-	else
-		return -in_unit_sphere;
-}
+#define CHUNKS 8
 
 Color ray_color(const Ray& r, Hitable *world, int depth) {
 	hit_record rec;
@@ -39,17 +31,13 @@ Color ray_color(const Ray& r, Hitable *world, int depth) {
 	if (depth <= 0)
 		return Color(0, 0, 0);
 
-	if (world->hit(r, 0.001, DBL_MAX, rec)) {
+	if (world->hit(r, 0.001, infinity, rec)) {
 		Ray scattered;
 		Color attenuation;
 		if ( (rec.mat_ptr)->scatter(r, rec, attenuation, scattered)) {
 			return attenuation * ray_color(scattered, world, depth - 1);
 		}
 		return Color(0, 0, 0);
-
-		//Vector3 target = rec.p + rec.normal + random_unit_vector(); //Lambertian rendering
-		//Vector3 target = rec.p + random_in_hemisphere(rec.normal); //Diffuse rendering
-		//return 0.5 * ray_color(Ray(rec.p, target - rec.p), world, depth - 1);
 	}
 	Vector3 unit_direction = unit_vector(r.direction());
 	double t = 0.5*(unit_direction.y() + 1.0);
@@ -59,24 +47,25 @@ Color ray_color(const Ray& r, Hitable *world, int depth) {
 int main()
 {
 	const double aspect_ratio = 16.0 / 9.0;
-	const int image_width = 500;
+	const int image_width = 500; //96
 	const int image_height = static_cast<int>(image_width / aspect_ratio);
 	const int max_depth = 50;
-	const int samples_per_pixel = 8;
+	const int samples_per_pixel = 20;
 
-	Camera cam(aspect_ratio, 2.0, 1.25);
+	Camera cam(90.0, aspect_ratio);
 
 	auto materialGround = make_shared<DiffuseMat>(Color(0.8, 0.8, 0.0));
 	auto materialCenter = make_shared<DiffuseMat>(Color(0.7, 0.3, 0.3));
 	auto materialBlue = make_shared<DiffuseMat>(Color(0.0, 0.2, 0.75));
-	auto materialMetal = make_shared<MetalMat>(Color(0.8, 0.3, 0.8));
+	auto materialGold = make_shared<MetalMat>(Color(0.8, 0.6, 0.2));
+	auto materialMetal = make_shared<MetalMat>(Color(0.8, 0.8, 0.8));
 
 	Hitable *list[5];
 	list[0] = new Sphere(Vector3(0, -100.5, -1), 100, materialGround);
 	list[1] = new Sphere(Vector3(0, 0, -1), 0.5, materialCenter);
 	list[2] = new Sphere(Vector3(-1, 0, -1), 0.5, materialMetal);
-	list[3] = new Sphere(Vector3(1, -0.175, -0.75), 0.25, materialMetal);
-	list[4] = new Sphere(Vector3(0.275, -0.15, -0.3), 0.3, materialBlue);
+	list[3] = new Sphere(Vector3(1, -0.175, -0.75), 0.25, materialGold);
+	list[4] = new Sphere(Vector3(0.368, -0.34, -0.42), 0.16, materialBlue);
 
 	Hitable *world = new HitableList(list, 5);
 
@@ -89,13 +78,22 @@ int main()
 	SoftwareRenderer* display = new SoftwareRenderer(image_width, image_height);
 
 	Color** grid = new Color*[image_width*image_height];
+	double dist = 0;
 
-	while (true) {
-		auto start = chrono::high_resolution_clock::now();
+	bool animated = true;
+	bool processFrames = true;
+
+	while (processFrames) {
+		if (animated == false) {
+			processFrames = false;
+		}
 		
-		#pragma omp parallel for num_threads(CHUNKS) 
+		auto start = chrono::high_resolution_clock::now();
+		int inc = 1;
+
+		//#pragma omp parallel for num_threads(CHUNKS) 
 		for (int y = 0; y < image_height; ++y) {
-			for (int x = 0; x < image_width; ++x) {
+			for (int x = 0; x <= image_width; x+=inc) {
 				Color pixel_color(0, 0, 0);
 				for (int s = 0; s < samples_per_pixel; ++s) {
 					auto u = (x + random_double()) / (image_width - 1);
@@ -103,14 +101,17 @@ int main()
 					Ray r = cam.get_ray(u, v);
 					pixel_color += ray_color(r, world, max_depth);
 				}
+
 				int id = (image_height - 1 - y) * image_width + x;
 				grid[id] = computeColor(x, y, pixel_color, scale);
+				for (int j = 1; j <= inc; j++) {
+					grid[id + j] = new Color(grid[id]->r(), grid[id]->g(), grid[id]->b());
+				}
 			}
 		}
 		auto stop = chrono::high_resolution_clock::now();
 		auto duration = chrono::duration_cast<chrono::milliseconds>(stop - start) / 1000.f;
 		cout << "Temps de rendu : " << duration.count() << " secondes" << endl;
-		cout << "FPS: " << 1/duration.count() << " FPS" << endl;
 
 		display->writeGridOfPixels(grid, image_width, image_height);
 
@@ -118,12 +119,22 @@ int main()
 			delete grid[i];
 		}
 
-		cam.moveZ(0.015);
-		cam.moveY(0.01);
+		if (animated) {
+			cout << "FPS: " << 1 / duration.count() << " FPS" << endl;
+			if (display->ProcessInput() == false) {
+				//Check for windows closing intention
+				break;
+			}
+		}
 
-		if (display->ProcessInput() == false) {
-			//Check for windows closing intention
-			break;
+		//cam.moveZ(0.015);
+		//dist += 0.03;
+		//cam.setCoords(Vector3(cos(dist*2.0),0.5 ,-1.0+sin(dist)));
+
+	}
+
+	if (animated == false) {
+		while (display->ProcessInput()) {
 		}
 	}
 
