@@ -72,8 +72,7 @@ int main()
 		}
 	}
 
-	ConsoleRenderer* d = (ConsoleRenderer*) display;
-	d->clear(0, 0, 255);
+	display->clear(0, 0, 255);
 
 	auto stop = chrono::high_resolution_clock::now();
 	auto duration = chrono::duration_cast<chrono::milliseconds>(stop - start)/1000.f;

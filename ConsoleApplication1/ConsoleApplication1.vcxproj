@@ -159,6 +159,7 @@
     <ClInclude Include="Color.h" />
     <ClInclude Include="ConsoleRenderer.h" />
     <ClInclude Include="Renderer.h" />
+    <ClInclude Include="SoftwareRenderer.h" />
     <ClInclude Include="utils.h" />
     <ClInclude Include="hitable.h" />
     <ClInclude Include="Hitable_list.h" />
@@ -178,6 +179,7 @@
     </ClCompile>
     <ClCompile Include="ConsoleRenderer.cpp" />
     <ClCompile Include="Color.cpp" />
+    <ClCompile Include="SoftwareRenderer.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

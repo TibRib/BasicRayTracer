@@ -30,15 +30,3 @@ void ConsoleRenderer::writePixel(const int x, const int y, Color& cc) const {
 void ConsoleRenderer::writePixel(const int x, const int y, int r, int g, int b) const {
     SetPixel(_consoleDC, _OFFSET_X + x, _OFFSET_Y - y, RGB(r, g, b));
 }
-
-void ConsoleRenderer::clear(int r, int g, int b) const {
-    for (int y = 0; y < _height; ++y) {
-        for (int x = 0; x < _width; ++x) {
-            this->writePixel(x, y, r, g, b);
-        }
-    }
-}
-
-void ConsoleRenderer::clear() const {
-    this->clear(255, 255, 255);
-}

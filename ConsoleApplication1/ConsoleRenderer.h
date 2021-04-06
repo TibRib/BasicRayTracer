@@ -1,5 +1,5 @@
-#ifndef _RENDERER_H_
-#define _RENDERER_H_
+#ifndef _CONSOLE_RENDERER_H_
+#define _CONSOLE_RENDERER_H_
 
 #include "Color.h"
 #include "Renderer.h"
@@ -27,8 +27,6 @@ public:
 	virtual ~ConsoleRenderer();
 	//Overrides
 	virtual void writePixel(const int x, const int y, Color& cc) const;
-	virtual void clear() const;
-	virtual void clear(int r, int g, int b) const;
 };
 
 #endif
