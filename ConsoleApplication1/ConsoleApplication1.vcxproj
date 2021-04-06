@@ -184,10 +184,13 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Color.h" />
     <ClInclude Include="ConsoleRenderer.h" />
+    <ClInclude Include="DiffuseMat.h" />
+    <ClInclude Include="Material.h" />
+    <ClInclude Include="MetalMat.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="SoftwareRenderer.h" />
     <ClInclude Include="utils.h" />
-    <ClInclude Include="hitable.h" />
+    <ClInclude Include="Hitable.h" />
     <ClInclude Include="Hitable_list.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Ray.h" />

@@ -3,12 +3,15 @@
 
 #include "Vector3.h"
 #include "Ray.h"
+#include "Material.h"
 
 struct hit_record {
 	double t;
 	Vector3 p;
 	Vector3 normal;
 	bool front_face;
+	
+	shared_ptr<Material> mat_ptr;
 
 	inline void set_face_normal(const Ray& r, const Vector3& outward_normal) {
 		front_face = dot(r.direction(), outward_normal) < 0;

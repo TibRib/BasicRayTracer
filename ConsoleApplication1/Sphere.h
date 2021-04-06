@@ -6,12 +6,16 @@
 
 class Sphere : public Hitable {
 public:
-	Sphere(){}
-	Sphere(Vector3 cen, double r) : center(cen), radius(r) {
-	};
-	virtual bool hit(const Ray&r, double t_min, double t_max, hit_record& rec) const;
 	Vector3 center;
 	double radius;
+	shared_ptr<Material> mat_ptr;
+
+	Sphere(){}
+	Sphere(Vector3 cen, double r, shared_ptr<Material> mat) 
+		: center(cen), radius(r), mat_ptr(mat) {};
+	
+	virtual bool hit(const Ray&r, double t_min, double t_max, hit_record& rec) const;
+	
 };
 
 bool Sphere::hit(const Ray&r, double t_min, double t_max, hit_record& rec) const {
@@ -37,6 +41,7 @@ bool Sphere::hit(const Ray&r, double t_min, double t_max, hit_record& rec) const
 	rec.normal = (rec.p - center) / radius;
 	Vector3 outward_normal = (rec.p - center) / radius;
 	rec.set_face_normal(r, outward_normal);
+	rec.mat_ptr = mat_ptr;
 
 	return true;
 }

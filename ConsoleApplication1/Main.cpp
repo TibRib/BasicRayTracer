@@ -3,6 +3,7 @@
 #include "utils.h"
 #include "Ray.h"
 #include "Hitable_list.h"
+#include "Hitable.h"
 #include "Sphere.h"
 #include "Camera.h"
 
@@ -12,7 +13,12 @@
 #include "ConsoleRenderer.h"
 #include "SoftwareRenderer.h"
 
+#include "Material.h"
+#include "MetalMat.h"
+#include "DiffuseMat.h"
+
 #include <chrono>
+#include <list>
 
 using namespace std;
 double sense = 0;
@@ -29,13 +35,21 @@ Vector3 random_in_hemisphere(const Vector3& normal) {
 
 Color ray_color(const Ray& r, Hitable *world, int depth) {
 	hit_record rec;
+	//Ray limit exceeded, returns black
 	if (depth <= 0)
 		return Color(0, 0, 0);
 
-	if (world->hit(r, 0.001, FLT_MAX, rec)) {
+	if (world->hit(r, 0.001, DBL_MAX, rec)) {
+		Ray scattered;
+		Color attenuation;
+		if ( (rec.mat_ptr)->scatter(r, rec, attenuation, scattered)) {
+			return attenuation * ray_color(scattered, world, depth - 1);
+		}
+		return Color(0, 0, 0);
+
 		//Vector3 target = rec.p + rec.normal + random_unit_vector(); //Lambertian rendering
-		Vector3 target = rec.p + random_in_hemisphere(rec.normal); //Diffuse rendering
-		return 0.5 * ray_color(Ray(rec.p, target - rec.p), world, depth - 1);
+		//Vector3 target = rec.p + random_in_hemisphere(rec.normal); //Diffuse rendering
+		//return 0.5 * ray_color(Ray(rec.p, target - rec.p), world, depth - 1);
 	}
 	Vector3 unit_direction = unit_vector(r.direction());
 	double t = 0.5*(unit_direction.y() + 1.0);
@@ -50,13 +64,21 @@ int main()
 	const int max_depth = 50;
 	const int samples_per_pixel = 8;
 
-	Camera cam;
+	Camera cam(aspect_ratio, 2.0, 1.25);
 
-	Hitable *list[2];
-	list[0] = new Sphere(Vector3(0, 0, -1), 0.5);
-	list[1] = new Sphere(Vector3(0, -100.5, -1), 100);
-	Hitable *world = new HitableList(list, 2);
+	auto materialGround = make_shared<DiffuseMat>(Color(0.8, 0.8, 0.0));
+	auto materialCenter = make_shared<DiffuseMat>(Color(0.7, 0.3, 0.3));
+	auto materialBlue = make_shared<DiffuseMat>(Color(0.0, 0.2, 0.75));
+	auto materialMetal = make_shared<MetalMat>(Color(0.8, 0.3, 0.8));
 
+	Hitable *list[5];
+	list[0] = new Sphere(Vector3(0, -100.5, -1), 100, materialGround);
+	list[1] = new Sphere(Vector3(0, 0, -1), 0.5, materialCenter);
+	list[2] = new Sphere(Vector3(-1, 0, -1), 0.5, materialMetal);
+	list[3] = new Sphere(Vector3(1, -0.175, -0.75), 0.25, materialMetal);
+	list[4] = new Sphere(Vector3(0.275, -0.15, -0.3), 0.3, materialBlue);
+
+	Hitable *world = new HitableList(list, 5);
 
 	int id = 0;
 	const int max = image_height * image_width;
