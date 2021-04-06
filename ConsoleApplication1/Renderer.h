@@ -1,27 +1,16 @@
-#ifndef _RENDERER_H_
-#define _RENDERER_H_
-
-#include "Color.h"
-
-/* Renderer class, for pixel writing operation,
-*  And any method related to displaying a window.
-*/
-
+#pragma once
 class Renderer
 {
-private:
-	static const int _OFFSET_X = 100;
-	static const int _OFFSET_Y = 500;
+protected:
+	int _width;
+	int _height;
 
-	//Windows console related handles
-	HWND _consoleWindow;
-	HDC _consoleDC;
+	virtual void writePixel(const int x, const int y, int r, int g, int b) const = 0;
 
 public:
-	Renderer();
-	~Renderer();
+	virtual ~Renderer(){}
 
-	void writePixel(const int x, const int y , Color& cc );
+	virtual void writePixel(const int x, const int y, Color& cc) const = 0;
+	virtual void clear() const = 0;
 };
 
-#endif

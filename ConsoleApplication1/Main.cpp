@@ -9,7 +9,7 @@
 #include "Vector3.h"
 #include "Color.h"
 
-#include "Renderer.h"
+#include "ConsoleRenderer.h"
 
 #include <chrono>
 
@@ -39,7 +39,7 @@ int main()
 	const int max_depth = 50;
 	const int samples_per_pixel = 100;
 
-	Renderer* display = new Renderer();
+	Renderer* display = new ConsoleRenderer(image_width, image_height);
 
 	Camera cam;
 
@@ -71,6 +71,9 @@ int main()
 
 		}
 	}
+
+	ConsoleRenderer* d = (ConsoleRenderer*) display;
+	d->clear(0, 0, 255);
 
 	auto stop = chrono::high_resolution_clock::now();
 	auto duration = chrono::duration_cast<chrono::milliseconds>(stop - start)/1000.f;
