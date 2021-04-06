@@ -30,6 +30,23 @@ public:
 	Vector3 getOrigin() const {
 		return origin;
 	}
+
+	void setOrigin(Vector3 newOrg){
+		this->origin = newOrg;
+	}
+
+	void moveZ(double zmovement) {
+		this->lower_left_corner.e[2] += zmovement;
+		this->origin.e[2] += zmovement;
+	}
+	void moveX(double xmovement) {
+		this->lower_left_corner.e[0] += xmovement;
+		this->origin.e[0] += xmovement;
+	}
+	void moveY(double ymovement) {
+		this->lower_left_corner.e[1] += ymovement;
+		this->origin.e[1] += ymovement;
+	}
 };
 
 #endif

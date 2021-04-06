@@ -33,6 +33,8 @@ public:
 
 	void writeRowOfPixels(const int col, Color** row) const;
 	void writeGridOfPixels(Color** grid, uint32_t width, uint32_t height) const;
+
+	bool ProcessInput();
 };
 
 #endif

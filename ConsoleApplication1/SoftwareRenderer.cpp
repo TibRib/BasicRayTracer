@@ -45,7 +45,7 @@ void Shutdown(SDL_Window** ppWindow, SDL_Renderer** ppRenderer, SDL_Texture** pp
 }
 
 // Call this once during each render loop in order to determine when the user wishes to terminate the program
-bool ProcessInput(){
+bool SoftwareRenderer::ProcessInput(){
     SDL_Event event;
 
     while (SDL_PollEvent(&event))
@@ -102,49 +102,13 @@ SoftwareRenderer::~SoftwareRenderer() {
 }
 
 void SoftwareRenderer::writePixel(const int x, const int y, Color& cc) const {
-    // Write the translated [0,255] value of each color component.
-    int iR = static_cast<int>(256 * clamp(cc.r(), 0.0, 0.999));
-    int iG = static_cast<int>(256 * clamp(cc.g(), 0.0, 0.999));
-    int iB = static_cast<int>(256 * clamp(cc.b(), 0.0, 0.999));
-
-    writePixel(x, y, iR, iG, iB);
 }
 
 void SoftwareRenderer::writePixel(const int x, const int y, int r, int g, int b) const {
 }
 
 void SoftwareRenderer::writeRowOfPixels(const int col, Color** row) const {
-    /* Render */
-    int32_t pitch = 0;
-    uint32_t* pPixelBuffer = nullptr;
-    // Lock the memory in order to write our Back Buffer image to it
-    if (!SDL_LockTexture(_pTexture, NULL, (void**)&pPixelBuffer, &pitch))
-    {
-        // The pitch of the Back Buffer texture in VRAM must be divided by four bytes
-        // as it will always be a multiple of four
-        pitch /= sizeof(uint32_t);
-
-        for (uint32_t i = 0; i < _width; ++i) {
-            uint32_t iR = static_cast<uint32_t>(256 * clamp(row[i]->r(), 0.0, 0.999));
-            uint32_t iG = static_cast<uint32_t>(256 * clamp(row[i]->g(), 0.0, 0.999));
-            uint32_t iB = static_cast<uint32_t>(256 * clamp(row[i]->b(), 0.0, 0.999));
-
-            uint32_t id = (uint32_t)col * (uint32_t)_width + (uint32_t)i;
-           
-            pPixelBuffer[id] = ARGB(iR, iG, iB, 255);
-        }
-
-
-        // Unlock the texture in VRAM to let the GPU know we are done writing to it
-        SDL_UnlockTexture(_pTexture);
-
-        // Copy our texture in VRAM to the display framebuffer in VRAM
-        SDL_RenderCopy(_pRenderer, _pTexture, NULL, NULL);
-
-        // Copy the VRAM framebuffer to the display
-        SDL_RenderPresent(_pRenderer);
-
-    }
+    writeGridOfPixels(row, _width, 1);
 }
 
 void SoftwareRenderer::writeGridOfPixels(Color** grid, uint32_t width, uint32_t height) const {
