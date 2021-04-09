@@ -9,7 +9,7 @@ I am also working on making it a faster with multi-processing, (usage of OpenMP 
 Pixels are written on a texture buffer and then sent to the GPU through the window (use of SDL) so we can benefit from having animated scenes. 
 There is also the possibility to write the pixels directly onto the console, but I depreciated it in favor of the technique mentioned previously.
 
-Go along and try the executable available in the v0.1 release ->
+Go ahead and try the executable available in the v0.1 release ->
 
 ## Previews
 
